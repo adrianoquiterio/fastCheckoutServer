@@ -4,8 +4,12 @@
   "description": "Server side - rest application node based of Fastcheck project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile" : "tsc"
   },
   "author": "Adriano Quiterio",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^2.3.2"
+  }
 }
