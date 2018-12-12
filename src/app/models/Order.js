@@ -1,10 +1,15 @@
-const item = require('./OrderItem');
-
 class Order{
     
-    constructor( dao ){
-        this._dao = dao;
-        rebuildMainVariables();
+    constructor( app  ){
+        this._app = app;
+        this.rebuildMainVariables();
+    };
+
+    rebuildMainVariables(){        
+        this._header = this._buildHeaderModel();
+        this._items = this._buildItemsModel();
+        this._fincInstruments = this._buildFinInsturments();   
+        this._totalValueOrder = 0;
     };
 
     _buildHeaderModel(){
@@ -37,27 +42,26 @@ class Order{
     };
 
     newOrder(){
-        rebuildMainVariables();
+        this.rebuildMainVariables();
     };
 
-    rebuildMainVariables(){
-        this._header = this._buildHeaderModel();
-        this._items = this._buildItemsModel();
-        this._fincInstruments = this._buildFinInsturments();   
-        this._totalValueOrder = 0;
-    };
+    
 
     addItem( item, quantity ){
-        var item = new item( this._dao );
-        item.add( item, quantity );
+        
+        
+        var orderItem = new this._app.src.app.models.OrderItem( this._app );
+        
+        orderItem.add( item, quantity );
 
-        this._items.push(item);        
+        this._items.push(orderItem);
+                
     };
 
     calculate(){
         this._totalValueOrder = this._items.reduce( ( total, value, index, array ) => {
             return total + value.total;
-        } );
+        }, 0 );
     };
 
     addPayment( value, type ){

@@ -1,11 +1,12 @@
 class OrderItem{
-    constructor( dao ){
-        this._dao = dao;
-        this.validate( item, quantity );
+    constructor( app ){        
+        this._app = app;
+        this._conn = app.src.app.persistence.mysqlFactory();
+        this._dao = new this._app.src.app.persistence.ProductsDao(  this._conn );
         this.item = {
             status : '',
-            product : item,
-            quantity : quantity,
+            product : null,
+            quantity : null,
             unitary : null,
             discount : null,
             total : null,
@@ -21,13 +22,13 @@ class OrderItem{
     };
 
     validate(item, quantity ){
-        if ( !isItemValid(item) ){
+        if ( !this.isItemValid(item) ){
             throw new Error( "Invalid item." );
         };
 
-        findItemDataBase(item);
+        this.findItemDataBase(item);
         
-        if ( !isQuantityValid(quantity) ) {
+        if ( !this.isQuantityValid(quantity) ) {
             throw new Error("Invalid quantity");
         };
     };
@@ -40,20 +41,25 @@ class OrderItem{
                 res.status(500).send(error);
                 return;
             };
+            return result;
+            console.log( `Resultado do sql ${JSON.stringify(result)}`)
             this.item.product = result[0].id;
             this.item.unitary = result[0].price;
+            
             res.status(200).json(result);
         };
 
         let info = this._dao.searchById( item, callback );
+        console.log(`Minha info é: ${JSON.stringify(info)}` )
     }
 
-    isItemValid( item ){
-        return !!item && item instanceof Number && item > 0;
+    isItemValid( item ){        
+        return !!item && typeof item == 'number' && item > 0;
     };
 
+
     isQuantityValid(quantity){
-        return !!quantity && quantity instanceof Number && quantity > 0;
+        return !!quantity && typeof quantity == 'number' && quantity > 0;
     };
 
     calculate(){
@@ -63,6 +69,6 @@ class OrderItem{
     };
 };
 
-module.exports = function (){
-    return OrderItem
+module.exports = () => {
+    return OrderItem;
 };
