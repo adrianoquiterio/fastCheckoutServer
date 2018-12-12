@@ -2,7 +2,8 @@ const item = require('./OrderItem');
 
 class Order{
     
-    constructor(){
+    constructor( dao ){
+        this._dao = dao;
         rebuildMainVariables();
     };
 
@@ -47,8 +48,10 @@ class Order{
     };
 
     addItem( item, quantity ){
-        var item = new item(item, quantity);
-        this._items.add(item);        
+        var item = new item( this._dao );
+        item.add( item, quantity );
+
+        this._items.push(item);        
     };
 
     calculate(){
