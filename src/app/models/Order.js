@@ -1,6 +1,7 @@
 class Order{
     
     constructor( app  ){
+        //console.log('Criando construtor do order')
         this._app = app;
         this.rebuildMainVariables();
     };
@@ -45,16 +46,11 @@ class Order{
         this.rebuildMainVariables();
     };
 
-    
-
-    addItem( item, quantity ){
-        
-        
+    addItem( item, quantity, req ){
+                
         var orderItem = new this._app.src.app.models.OrderItem( this._app );
-        
-        orderItem.add( item, quantity );
-
-        this._items.push(orderItem);
+        req.session.order.items.push( orderItem.add( item, quantity ) );
+        console.log(`Quantidade de itens: ${ req.session.order.items.length } - Session: ${ req.sessionID }`)
                 
     };
 
@@ -66,7 +62,6 @@ class Order{
 
     addPayment( value, type ){
         this.calculate();
-
     };
 
     cancelItem( itemId ){
@@ -91,14 +86,14 @@ class Order{
     };
     
 };
-
+/*
 Order.prototype.toString = function orderToString(){
     return JSON.stringify({
         header : this._header,
         itens : this._items,
         fincInstruments : this._fincInstruments
     });
-};
+};*/
 
 module.exports = () => {
     return Order;

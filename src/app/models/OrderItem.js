@@ -19,6 +19,8 @@ class OrderItem{
 
         this.item.product = item;
         this.item.quantity = quantity;
+        //console.log(`Próximo de retornar item: ${JSON.stringify(this.item)}`)
+        return this.item;
     };
 
     validate(item, quantity ){
@@ -38,7 +40,7 @@ class OrderItem{
         let callback = function( error, result, fields ) {
             if( error ){
                 console.log(`Something happened during the query:  ${error}`);
-                res.status(500).send(error);
+                //res.status(500).send(error);
                 return;
             };
             return result;
@@ -50,13 +52,12 @@ class OrderItem{
         };
 
         let info = this._dao.searchById( item, callback );
-        console.log(`Minha info é: ${JSON.stringify(info)}` )
+        //console.log(`Minha info é: ${JSON.stringify(info)}` )
     }
 
     isItemValid( item ){        
         return !!item && typeof item == 'number' && item > 0;
     };
-
 
     isQuantityValid(quantity){
         return !!quantity && typeof quantity == 'number' && quantity > 0;
