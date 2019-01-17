@@ -6,8 +6,17 @@ class ProductsDao{
         this._connection.query("select * from full_product" , callback);
     };
 
-    searchById( id, callback ){
-        this._connection.query("select * from full_product where id = ? " , id , callback);
+    async searchById( id, callback ){        
+        return new Promise((resolve, reject) => {
+            let busca = this._connection.query("select * from full_product where id = ? " , id );
+            busca
+                .on('error', function (err){
+                    reject('Houve um erro na consulta ao banco' + err);
+                })
+                .on('result', function(row){                    
+                    resolve(row);
+                });            
+        });
     };
 
     insert( data, callback){

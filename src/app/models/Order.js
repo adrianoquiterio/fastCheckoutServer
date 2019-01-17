@@ -1,7 +1,7 @@
 class Order{
     
     constructor( app  ){
-        //console.log('Criando construtor do order')
+        
         this._app = app;
         this.rebuildMainVariables();
     };
@@ -46,18 +46,22 @@ class Order{
         this.rebuildMainVariables();
     };
 
-    addItem( item, quantity, req ){
+    async addItem( item, quantity, req ){
                 
-        var orderItem = new this._app.src.app.models.OrderItem( this._app );
-        req.session.order.items.push( orderItem.add( item, quantity ) );
-        console.log(`Quantidade de itens: ${ req.session.order.items.length } - Session: ${ req.sessionID }`)
-                
+        let orderItem = new this._app.src.app.models.OrderItem( this._app );
+        let resultadoAdicao = await orderItem.add( item, quantity );
+        
+        req.session.order.items.push( resultadoAdicao );
+
+        this.calculate(req)
+        console.log(`Quantidade de itens: ${ req.session.order.items.length } - Session: ${ req.sessionID }`);
+        console.log('Total ' + this._totalValueOrder );
     };
 
-    calculate(){
-        this._totalValueOrder = this._items.reduce( ( total, value, index, array ) => {
-            return total + value.total;
-        }, 0 );
+    calculate( req ){
+        this._totalValueOrder = req.session.order.items.reduce( ( total, value, index, array ) => {            
+            return total + ( value.total ) ;
+        }, 0 );        
     };
 
     addPayment( value, type ){
@@ -86,14 +90,7 @@ class Order{
     };
     
 };
-/*
-Order.prototype.toString = function orderToString(){
-    return JSON.stringify({
-        header : this._header,
-        itens : this._items,
-        fincInstruments : this._fincInstruments
-    });
-};*/
+
 
 module.exports = () => {
     return Order;

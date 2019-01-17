@@ -1,3 +1,5 @@
+
+
 class OrderItem{
     constructor( app ){        
         this._app = app;
@@ -12,14 +14,17 @@ class OrderItem{
             total : null,
             gst : null
         };
-    }
+    };
 
-    add( item, quantity ){
+    async add( item, quantity ){
         this.validate( item, quantity );
+        let produto = await this.findItemDataBase(item);
 
         this.item.product = item;
+        this.item.unitary = produto.price;
         this.item.quantity = quantity;
-        //console.log(`Próximo de retornar item: ${JSON.stringify(this.item)}`)
+        this.item.total = this.item.unitary * this.item.quantity;
+        console.log(`Próximo de retornar item: ${JSON.stringify(this.item)}`)
         return this.item;
     };
 
@@ -28,32 +33,18 @@ class OrderItem{
             throw new Error( "Invalid item." );
         };
 
-        this.findItemDataBase(item);
-        
         if ( !this.isQuantityValid(quantity) ) {
             throw new Error("Invalid quantity");
         };
     };
 
-    findItemDataBase( item ){
-
-        let callback = function( error, result, fields ) {
-            if( error ){
-                console.log(`Something happened during the query:  ${error}`);
-                //res.status(500).send(error);
-                return;
-            };
-            return result;
-            console.log( `Resultado do sql ${JSON.stringify(result)}`)
-            this.item.product = result[0].id;
-            this.item.unitary = result[0].price;
-            
-            res.status(200).json(result);
-        };
-
-        let info = this._dao.searchById( item, callback );
-        //console.log(`Minha info é: ${JSON.stringify(info)}` )
-    }
+    async findItemDataBase( item ){
+        let resultado = await this._dao.searchById(item, function(error, result){
+            if(error) throw error
+            return result
+        });
+        return resultado;        
+    };
 
     isItemValid( item ){        
         return !!item && typeof item == 'number' && item > 0;
