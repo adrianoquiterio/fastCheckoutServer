@@ -18,13 +18,22 @@ class OrderItem{
 
     async add( item, quantity ){
         this.validate( item, quantity );
-        let produto = await this.findItemDataBase(item);
-
-        this.item.product = item;
-        this.item.unitary = produto.price;
-        this.item.quantity = quantity;
-        this.item.total = this.item.unitary * this.item.quantity;
-        console.log(`Próximo de retornar item: ${JSON.stringify(this.item)}`)
+       
+        let product = await this.findItemDataBase(item);
+        let rowsResulted = product.length;     
+        
+        if( rowsResulted === 1 ) {
+            this.item.status = 1;
+            this.item.product = item;
+            this.item.unitary = product[0].price;
+            this.item.description = product[0].description;
+            this.item.quantity = quantity;
+            this.item.total = this.item.unitary * this.item.quantity;    
+        } else if( rowsResulted == 0 ){
+            throw new Error(`There is any product registered with the code ${item}`);
+        } else {
+            throw new Error(`There are ${rowsResulted} products on database whith the code: ${item}`)
+        };        
         return this.item;
     };
 
@@ -38,15 +47,16 @@ class OrderItem{
         };
     };
 
-    async findItemDataBase( item ){
-        let resultado = await this._dao.searchById(item, function(error, result){
-            if(error) throw error
+    async findItemDataBase( item ){    
+            
+        let resultado = await this._dao.searchById(item, function(error, result){            
             return result
         });
         return resultado;        
     };
 
     isItemValid( item ){        
+
         return !!item && typeof item == 'number' && item > 0;
     };
 

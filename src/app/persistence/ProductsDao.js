@@ -8,14 +8,24 @@ class ProductsDao{
 
     async searchById( id, callback ){        
         return new Promise((resolve, reject) => {
-            let busca = this._connection.query("select * from full_product where id = ? " , id );
+            let busca = this._connection.query("select * from full_product where id = ? " , id );            
+            let rows = [];
+            
             busca
-                .on('error', function (err){
-                    reject('Houve um erro na consulta ao banco' + err);
+                .on('error', function (err){                  
+                    console.log("Error during database access: " + err );  
+                    reject(", please contact the Systems Administrator ");
                 })
-                .on('result', function(row){                    
-                    resolve(row);
-                });            
+
+                .on('result', function(row){                          
+                    rows.push(row);
+                    resolve(rows);
+                })     
+                .on("end", function(){
+                    // Necessary where the query returns empty        
+                    resolve(rows);                    
+                });    
+            
         });
     };
 
